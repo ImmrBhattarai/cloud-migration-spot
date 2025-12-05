@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cloud Migration Demo - Image Processing</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .card { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px; }
+        .status { font-weight: bold; }
+        img { max-width: 100%; height: auto; }
+        .result { margin-top: 1rem; }
+        .small { font-size: 0.9rem; color: #666; }
+        input[type="file"] { margin-top: 0.5rem; }
+        button { margin-top: 0.5rem; padding: 0.3rem 0.8rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Cloud Migration Demo - Spot-Ready Image Processor</h1>
+    <p class="small">
+        This simple app represents an interruptible workload suitable for spot instances.
+        Upload an image to create a processing job. A background worker (on a separate “instance”) will convert it to grayscale.
+    </p>
+
+    <div class="card">
+        <h2>1. Upload an Image</h2>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept="image/*" required>
+            <br>
+            <button type="submit">Create Job</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>2. Job Status</h2>
+        {% if job_id %}
+            <p>Job ID: <code>{{ job_id }}</code></p>
+            {% if job %}
+                <p>Status: <span class="status">{{ job.status }}</span></p>
+                {% if job.error %}
+                    <p style="color: red;">Error: {{ job.error }}</p>
+                {% endif %}
+                {% if job.result_path %}
+                    <div class="result">
+                        <h3>Processed Image:</h3>
+                        <img src="/jobs/{{ job.id }}/result" alt="Processed image">
+                    </div>
+                {% else %}
+                    <p>Refresh the page after a few seconds to check if the job is done.</p>
+                {% endif %}
+            {% else %}
+                <p>Job not found. It may have expired or never existed.</p>
+            {% endif %}
+        {% else %}
+            <p>No job selected. Upload an image to create a new job.</p>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

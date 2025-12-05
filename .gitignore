@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+
+# Virtualenv
+.venv/
+env/
+venv/
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# Local data (jobs, images, etc.)
+data/
+
+# Byte-compiled
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
