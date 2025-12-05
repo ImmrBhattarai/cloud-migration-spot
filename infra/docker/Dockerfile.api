@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy and install dependencies
-COPY pyproject.toml poetry.lock* requirements.txt* /tmp/ 2>/dev/null || true
+COPY requirements.txt /tmp/
 
 # Fallback: if requirements.txt doesn't exist, create via pip freeze (optional in dev)
 RUN if [ -f /tmp/requirements.txt ]; then pip install --no-cache-dir -r /tmp/requirements.txt; fi
