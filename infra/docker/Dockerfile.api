@@ -2,28 +2,14 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Disabling the sandbox user, as it conflicts against rootless podman in Fedora Linux 43
-RUN echo 'APT::Sandbox::User "root";' > /etc/apt/apt.conf.d/10sandbox && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-        libjpeg-dev zlib1g-dev && \
-    rm -rf /var/lib/apt/lists/*
-
 # Install system deps for Pillow
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg-dev zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy and install dependencies
-COPY requirements.txt /tmp/
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-# Fallback: if requirements.txt doesn't exist, create via pip freeze (optional in dev)
-RUN if [ -f /tmp/requirements.txt ]; then pip install --no-cache-dir -r /tmp/requirements.txt; fi
-
-# Alternatively, for this small project, just install directly:
-RUN pip install --no-cache-dir fastapi uvicorn[standard] pydantic pillow python-multipart jinja2
-
-# Copy code
 COPY . /app
 
 EXPOSE 8000
