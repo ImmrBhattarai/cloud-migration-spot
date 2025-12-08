@@ -10,7 +10,12 @@ from common.storage import create_job_from_bytes, get_job, download_result_to_te
 app = FastAPI(title="Cloud Migration Demo API")
 
 # Static files and templates
-app.mount("/static", StaticFiles(directory=str(Path(__file__).parent / "static")), name="static")
+# check_dir=False prevents crashes if the directory is present but empty (or even missing).
+app.mount(
+    "/static",
+    StaticFiles(directory=str(Path(__file__).parent / "static"), check_dir=False),
+    name="static",
+)
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 
 # ---------- API endpoints ----------
@@ -19,7 +24,6 @@ templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 async def create_job(file: UploadFile = File(...)):
     content = await file.read()
 
-    # If using GCP we need the GCS bucket name in env var GCS_BUCKET (read from config at runtime)
     from os import getenv
     gcs_bucket = getenv("GCS_BUCKET", None)
 
@@ -42,7 +46,6 @@ def get_result(job_id: str):
     job = get_job(job_id, gcs_bucket=gcs_bucket) if STORAGE_BACKEND == "gcp" else get_job(job_id)
     if not job or not job.result_path:
         raise HTTPException(status_code=404, detail="Result not available")
-    # For GCS we will download the result to a temp file and serve it
     path = download_result_to_tempfile(job, gcs_bucket=gcs_bucket) if STORAGE_BACKEND == "gcp" else Path(job.result_path)
     if not path.exists():
         raise HTTPException(status_code=404, detail="Result file missing")
@@ -61,10 +64,8 @@ def home(request: Request, job_id: str | None = None):
         {"request": request, "job": job, "job_id": job_id},
     )
 
-# Add GET /upload so direct GET requests do not 404; render the same uploading page.
 @app.get("/upload", response_class=HTMLResponse)
 def upload_page(request: Request):
-    # Keep behavior identical to "/" to avoid 404 when someone visits /upload
     return templates.TemplateResponse(
         "index.html",
         {"request": request, "job": None, "job_id": None},
@@ -81,5 +82,4 @@ async def upload_image(request: Request, file: UploadFile = File(...)):
     gcs_bucket = getenv("GCS_BUCKET", None)
 
     job = create_job_from_bytes(file.filename, content, gcs_bucket=gcs_bucket)
-    # Redirect to home with job_id so user can see status
     return RedirectResponse(url=f"/?job_id={job.id}", status_code=303)
