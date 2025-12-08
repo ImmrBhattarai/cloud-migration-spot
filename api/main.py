@@ -9,8 +9,7 @@ from common.storage import create_job_from_bytes, get_job, download_result_to_te
 
 app = FastAPI(title="Cloud Migration Demo API")
 
-# Static files and templates
-# check_dir=False prevents crashes if the directory is present but empty (or even missing).
+# Static files and templates (check_dir=False avoids crash if empty/missing)
 app.mount(
     "/static",
     StaticFiles(directory=str(Path(__file__).parent / "static"), check_dir=False),
