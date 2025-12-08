@@ -60,3 +60,26 @@ def home(request: Request, job_id: str | None = None):
         "index.html",
         {"request": request, "job": job, "job_id": job_id},
     )
+
+# Add GET /upload so direct GET requests do not 404; render the same uploading page.
+@app.get("/upload", response_class=HTMLResponse)
+def upload_page(request: Request):
+    # Keep behavior identical to "/" to avoid 404 when someone visits /upload
+    return templates.TemplateResponse(
+        "index.html",
+        {"request": request, "job": None, "job_id": None},
+    )
+
+@app.post("/upload", response_class=HTMLResponse)
+async def upload_image(request: Request, file: UploadFile = File(...)):
+    if not file:
+        raise HTTPException(status_code=400, detail="File required")
+
+    content = await file.read()
+
+    from os import getenv
+    gcs_bucket = getenv("GCS_BUCKET", None)
+
+    job = create_job_from_bytes(file.filename, content, gcs_bucket=gcs_bucket)
+    # Redirect to home with job_id so user can see status
+    return RedirectResponse(url=f"/?job_id={job.id}", status_code=303)
