@@ -28,3 +28,4 @@ pillow
 python-multipart
 jinja2
 google-cloud-storage
+azure-storage-blob
