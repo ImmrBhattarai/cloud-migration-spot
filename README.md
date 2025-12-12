@@ -4,6 +4,9 @@ This project demonstrates a production-style migration of a stateless, interrupt
 The goal is to migrate a containerized application running on GCP Preemptible VMs to Azure Spot VMs, including migrating the object storage data, while maintaining minimal cost and using industry-standard practices.
 This project is referenced from the client work type I performed at my last job.
 
+### Medium Article
+For detailed step breakdown, follow this Medium Article I wrote about this project: [Medium Article](https://medium.com/@immrbhattarai/how-i-migrated-a-spot-instance-workload-from-gcp-to-azure-for-90-less-cost-4c716d82f1b0)
+
 <img width="1366" height="680" alt="Screenshot From 2025-12-05 21-45-10" src="https://github.com/user-attachments/assets/030871ed-9820-4a5a-adf8-c657d1420997" />
 <img width="1366" height="722" alt="Screenshot From 2025-12-05 21-53-55" src="https://github.com/user-attachments/assets/9f8c4d2a-4597-4175-936d-0bc8d68777af" />
 
